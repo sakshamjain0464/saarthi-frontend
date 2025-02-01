@@ -1,3 +1,5 @@
+
+
 /* General Styles */
 body {
     font-family: 'Poppins', Arial, sans-serif;
@@ -35,6 +37,36 @@ h1 {
     padding: 15px 0;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
+}
+
+/* Centered Start Button */
+.start-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Full height of the chat container */
+}
+
+.start-button {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #2193b0;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+}
+
+.start-button:hover {
+    background-color: #1a7bb9;
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.start-button:active {
+    transform: scale(0.95); /* Slightly shrink the button when clicked */
 }
 
 /* Chat Box */

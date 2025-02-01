@@ -1,53 +1,25 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import axios from 'axios';
-import { auth, signInWithPopup, GoogleAuthProvider, signOut } from './firebase'; // Import Firebase auth
 import './App.css';
 
 function App() {
-    const [user, setUser] = useState(null); // Tracks authenticated user
-    const [messages, setMessages] = useState([]); // Chat messages
-    const [input, setInput] = useState(''); // User input
-    const [loading, setLoading] = useState(false); // Loading state
-    const [conversationState, setConversationState] = useState('idle'); // Conversation flow state
-    const [destination, setDestination] = useState(''); // User's destination
-    const [days, setDays] = useState(''); // Number of travel days
-    const [interests, setInterests] = useState(''); // User's interests
-    const [itinerary, setItinerary] = useState(''); // Generated itinerary
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [conversationState, setConversationState] = useState('idle'); // Tracks the conversation flow
+    const [destination, setDestination] = useState('');
+    const [days, setDays] = useState('');
+    const [interests, setInterests] = useState('');
+    const [itinerary, setItinerary] = useState(''); // Store the generated itinerary
 
-    // Check if the user is logged in
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            setUser(currentUser);
-        });
-        return () => unsubscribe();
-    }, []);
-
-    // Login with Google
-    const loginWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (error) {
-            console.error("Error logging in:", error.message);
-        }
-    };
-
-    // // Logout
-    // const logout = async () => {
-    //     try {
-    //         await signOut(auth);
-    //     } catch (error) {
-    //         console.error("Error logging out:", error.message);
-    //     }
-    // };
-
-    // Start the chat conversation
     const startChat = () => {
-        setMessages([{ sender: 'bot', text: 'Welcome to Saarthi! Where would you like to travel? Please specify your destination.' }]);
+        setMessages([{ sender: 'bot', text: 'Hi I am Saarthi, Where would you like to travel? Please specify your destination.' }]);
         setConversationState('askDestination');
     };
 
-    // Reset the chat
+    
+    
     const resetChat = () => {
         setMessages([]);
         setInput('');
@@ -58,17 +30,10 @@ function App() {
         setConversationState('idle');
     };
 
-    // Send message to the backend
-    const sendMessage = async (e) => {
-        e.preventDefault();
-
-        if (!user) {
-            alert("Please log in to use the chatbot.");
-            return;
-        }
-
+    const sendMessage = async () => {
         if (input.trim() === '') return;
 
+        // Add user message to the chat
         const newMessages = [...messages, { sender: 'user', text: input }];
         setMessages(newMessages);
         setInput('');
@@ -76,32 +41,39 @@ function App() {
         try {
             setLoading(true);
 
+            // Handle conversation flow
             if (conversationState === 'askDestination') {
+                // Save destination and ask for days
                 setDestination(input);
                 setConversationState('askDays');
                 setMessages([...newMessages, { sender: 'bot', text: 'How many days will you be traveling?' }]);
             } else if (conversationState === 'askDays') {
+                // Save days and ask for interests
                 setDays(input);
                 setConversationState('askInterests');
                 setMessages([...newMessages, { sender: 'bot', text: 'What are your interests? (e.g., Culture, Food, Nature)' }]);
             } else if (conversationState === 'askInterests') {
+                // Save interests and generate itinerary
                 setInterests(input);
-                const response = await axios.post('/api/generate-itinerary', {
+                const response = await axios.post('https://saarthi-backend-mie7.onrender.com/generate-itinerary', {
                     destination,
                     days,
                     interests: input.split(',').map((i) => i.trim()),
                 });
 
+                // Format the response (handle bold text)
                 const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 setMessages([...newMessages, { sender: 'bot', text: formattedResponse }]);
-                setItinerary(formattedResponse);
-                setConversationState('postItinerary');
-            } else if (conversationState === 'freeChat') {
-                const response = await axios.post('/api/generate-itinerary', {
+                setItinerary(formattedResponse); // Store the itinerary
+                setConversationState('postItinerary'); // Transition to post-itinerary state
+            } else if (conversationState === 'postItinerary' || conversationState === 'freeChat') {
+                // Handle follow-up questions with itinerary context
+                const response = await axios.post('https://saarthi-backend-mie7.onrender.com/generate-itinerary', {
                     followUpQuestion: input,
-                    itinerary,
+                    itinerary, // Include the itinerary context
                 });
 
+                // Format the response (handle bold text)
                 const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 setMessages([...newMessages, { sender: 'bot', text: formattedResponse }]);
             }
@@ -114,79 +86,60 @@ function App() {
     };
 
     return (
-        <div className="chat-container">
-            {/* Header */}
-            <h1>🌍 Saarthi - Your Travel Companion</h1>
-
-            {/* Authentication Section */}
-            {!user ? (
-                <div className="start-button-container">
-                    <button className="start-button" onClick={loginWithGoogle}>
-                        Login with Google
-                    </button>
+    <div className="chat-container">
+        {conversationState === 'idle' ? (
+            <div className="start-button-container">
+                <button className="start-button" onClick={startChat}>
+                    Start Chat
+                </button>
+            </div>
+        ) : (
+            <>
+                <h1>🌍 Saarthi - Your Travel Companion</h1>
+                <div className="chat-box">
+                    {messages.map((msg, index) => (
+                        <div key={index} className={`message ${msg.sender}`}>
+                            <p dangerouslySetInnerHTML={{ __html: msg.text }} />
+                        </div>
+                    ))}
+                    {loading && (
+                        <div className="loader">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    )}
                 </div>
-            ) : (
-                <>
-                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                        <p>Welcome, {user.displayName || user.email}!</p>
-                        <button onClick={logout}>Logout</button>
-                    </div>
-
-                    {/* Chat Interface */}
-                    {conversationState === 'idle' ? (
-                        <div className="start-button-container">
-                            <button className="start-button" onClick={startChat}>
-                                Start Chat
+                <form onSubmit={sendMessage} className="input-container">
+                    {conversationState === 'postItinerary' ? (
+                        <div className="post-itinerary-buttons">
+                            <button type="button" onClick={() => setConversationState('freeChat')}>
+                                Ask Any Question
+                            </button>
+                            <button type="button" onClick={resetChat}>
+                                Plan Another Trip
                             </button>
                         </div>
                     ) : (
                         <>
-                            <div className="chat-box">
-                                {messages.map((msg, index) => (
-                                    <div key={index} className={`message ${msg.sender}`}>
-                                        <p dangerouslySetInnerHTML={{ __html: msg.text }} />
-                                    </div>
-                                ))}
-                                {loading && (
-                                    <div className="loader">
-                                        <span></span>
-                                        <span></span>
-                                        <span></span>
-                                    </div>
-                                )}
-                            </div>
-                            <form onSubmit={sendMessage} className="input-container">
-                                {conversationState === 'postItinerary' ? (
-                                    <div className="post-itinerary-buttons">
-                                        <button type="button" onClick={() => setConversationState('freeChat')}>
-                                            Ask Any Question
-                                        </button>
-                                        <button type="button" onClick={resetChat}>
-                                            Plan Another Trip
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <input
-                                            type="text"
-                                            value={input}
-                                            onChange={(e) => setInput(e.target.value)}
-                                            placeholder="Type your message..."
-                                            disabled={loading}
-                                            onKeyDown={(e) => e.key === 'Enter' && sendMessage(e)}
-                                        />
-                                        <button type="submit" disabled={loading}>
-                                            Send
-                                        </button>
-                                    </>
-                                )}
-                            </form>
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder="Type your message..."
+                                disabled={loading}
+                                onKeyDown={(e) => e.key === 'Enter' && sendMessage(e)}
+                            />
+                            <button type="submit" disabled={loading}>
+                                Send
+                            </button>
                         </>
                     )}
-                </>
-            )}
-        </div>
-    );
+                </form>
+            </>
+        )}
+    </div>
+);
 }
 
 export default App;

@@ -1,102 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-
-// Styles
-const styles = {
-  message: `
-    margin: 1rem 0;
-    max-width: 80%;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
-    animation: fadeIn 0.3s ease-in-out;
-  `,
-  userMessage: `
-    margin-left: auto;
-    background-color: #1a73e8;
-    color: white;
-    border-bottom-right-radius: 0.25rem;
-  `,
-  botMessage: `
-    margin-right: auto;
-    background-color: #f1f3f4;
-    color: #202124;
-    border-bottom-left-radius: 0.25rem;
-  `,
-  typingAnimation: `
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
-  `,
-  dot: `
-    width: 8px;
-    height: 8px;
-    background: #90909090;
-    border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out;
-  `,
-};
-
-// Add styles to head
-const styleSheet = document.createElement("style");
-styleSheet.textContent = `
-  @keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .dot:nth-child(1) { animation-delay: -0.32s; }
-  .dot:nth-child(2) { animation-delay: -0.16s; }
-
-  .overflow-y-auto {
-    scrollbar-width: thin;
-    scrollbar-color: #90909090 transparent;
-  }
-
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background-color: #90909090;
-    border-radius: 3px;
-  }
-`;
-document.head.appendChild(styleSheet);
+import styles from './ChatStyles.module.css';
 
 const TypingAnimation = () => (
-  <div style={{ ...parseStyles(styles.typingAnimation) }}>
-    <div className="dot" style={{ ...parseStyles(styles.dot) }}></div>
-    <div className="dot" style={{ ...parseStyles(styles.dot) }}></div>
-    <div className="dot" style={{ ...parseStyles(styles.dot) }}></div>
+  <div className={styles.typingAnimation}>
+    <div className={styles.dot}></div>
+    <div className={styles.dot}></div>
+    <div className={styles.dot}></div>
   </div>
 );
-
-// Helper function to parse CSS string to object
-function parseStyles(styleString) {
-  return styleString.split(';').reduce((acc, style) => {
-    const [property, value] = style.split(':').map(str => str.trim());
-    if (property && value) {
-      const camelCaseProperty = property.replace(/-([a-z])/g, g => g[1].toUpperCase());
-      acc[camelCaseProperty] = value;
-    }
-    return acc;
-  }, {});
-}
 
 const Message = ({ text, sender, isTyping }) => {
   const [displayText, setDisplayText] = useState('');
@@ -126,13 +38,12 @@ const Message = ({ text, sender, isTyping }) => {
     }
   }, [text, sender, isTyping]);
 
-  const messageStyle = {
-    ...parseStyles(styles.message),
-    ...(sender === 'user' ? parseStyles(styles.userMessage) : parseStyles(styles.botMessage))
-  };
+  const messageClasses = `${styles.message} ${
+    sender === 'user' ? styles.userMessage : styles.botMessage
+  }`;
 
   return (
-    <div style={messageStyle}>
+    <div className={messageClasses}>
       <div
         className="message-content"
         dangerouslySetInnerHTML={{
@@ -291,7 +202,7 @@ function App() {
 
             <div
               ref={chatBoxRef}
-              className="flex-1 overflow-y-auto mb-4 bg-white rounded-lg shadow-md p-4"
+              className={`flex-1 overflow-y-auto mb-4 bg-white rounded-lg shadow-md p-4 ${styles.chatBox}`}
             >
               {messages.map((msg, index) => (
                 <Message

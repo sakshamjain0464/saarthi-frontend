@@ -128,21 +128,33 @@ button:hover {
     background-color: #1a7bb9;
 }
 
-/* Loader */
-.loader {
-    text-align: center;
-    font-style: italic;
-    color: #2193b0;
-    margin-top: 10px;
-    animation: spin 1s linear infinite;
+/* Progress Bar Animation */
+.loader-bar {
+    width: 100%;
+    height: 4px;
+    background-color: #ddd;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
+.loader-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #2193b0, #6dd5ed);
+    animation: slide 2s infinite ease-in-out;
+}
+
+@keyframes slide {
+    0% {
+        left: -100%;
     }
-    to {
-        transform: rotate(360deg);
+    100% {
+        left: 100%;
     }
 }
 

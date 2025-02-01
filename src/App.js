@@ -32,14 +32,14 @@ function App() {
         }
     };
 
-    // Logout
-    const logout = async () => {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            console.error("Error logging out:", error.message);
-        }
-    };
+    // // Logout
+    // const logout = async () => {
+    //     try {
+    //         await signOut(auth);
+    //     } catch (error) {
+    //         console.error("Error logging out:", error.message);
+    //     }
+    // };
 
     // Start the chat conversation
     const startChat = () => {

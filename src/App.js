@@ -18,6 +18,8 @@ function App() {
         setConversationState('askDestination');
     };
 
+    
+    
     const resetChat = () => {
         setMessages([]);
         setInput('');
@@ -84,40 +86,60 @@ function App() {
     };
 
     return (
-        <div className="chat-container">
-            <div className="chat-box">
-                {messages.map((msg, index) => (
-                    <div key={index} className={`message ${msg.sender}`}>
-                        <p dangerouslySetInnerHTML={{ __html: msg.text }} />
-                    </div>
-                ))}
-                {loading && <div className="loader">Generating response...</div>}
+    <div className="chat-container">
+        {conversationState === 'idle' ? (
+            <div className="start-button-container">
+                <button className="start-button" onClick={startChat}>
+                    Start Chat
+                </button>
             </div>
-            <div className="input-container">
-                {conversationState === 'idle' ? (
-                    <button onClick={startChat}>Start Chat</button>
-                ) : conversationState === 'postItinerary' ? (
-                    <div className="post-itinerary-buttons">
-                        <button onClick={() => setConversationState('freeChat')}>Ask Any Question</button>
-                        <button onClick={resetChat}>Generate Itinerary for Another Destination</button>
-                    </div>
-                ) : (
-                    <>
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder="Type your message..."
-                            disabled={loading}
-                        />
-                        <button onClick={sendMessage} disabled={loading}>
-                            Send
-                        </button>
-                    </>
-                )}
-            </div>
-        </div>
-    );
+        ) : (
+            <>
+                <h1>🌍 Saarthi - Your Travel Companion</h1>
+                <div className="chat-box">
+                    {messages.map((msg, index) => (
+                        <div key={index} className={`message ${msg.sender}`}>
+                            <p dangerouslySetInnerHTML={{ __html: msg.text }} />
+                        </div>
+                    ))}
+                    {loading && (
+                        <div className="loader">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    )}
+                </div>
+                <form onSubmit={sendMessage} className="input-container">
+                    {conversationState === 'postItinerary' ? (
+                        <div className="post-itinerary-buttons">
+                            <button type="button" onClick={() => setConversationState('freeChat')}>
+                                Ask Any Question
+                            </button>
+                            <button type="button" onClick={resetChat}>
+                                Plan Another Trip
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder="Type your message..."
+                                disabled={loading}
+                                onKeyDown={(e) => e.key === 'Enter' && sendMessage(e)}
+                            />
+                            <button type="submit" disabled={loading}>
+                                Send
+                            </button>
+                        </>
+                    )}
+                </form>
+            </>
+        )}
+    </div>
+);
 }
 
 export default App;

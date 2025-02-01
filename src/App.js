@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from './firebase';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import axios from 'axios';
+import { auth, signInWithPopup, GoogleAuthProvider, signOut } from './firebase'; // Import Firebase auth
 import './App.css';
 
 function App() {
-    const [user, setUser] = useState(null); // Tracks the authenticated user
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [conversationState, setConversationState] = useState('idle');
-    const [destination, setDestination] = useState('');
-    const [days, setDays] = useState('');
-    const [interests, setInterests] = useState('');
-    const [itinerary, setItinerary] = useState('');
+    const [user, setUser] = useState(null); // Tracks authenticated user
+    const [messages, setMessages] = useState([]); // Chat messages
+    const [input, setInput] = useState(''); // User input
+    const [loading, setLoading] = useState(false); // Loading state
+    const [conversationState, setConversationState] = useState('idle'); // Conversation flow state
+    const [destination, setDestination] = useState(''); // User's destination
+    const [days, setDays] = useState(''); // Number of travel days
+    const [interests, setInterests] = useState(''); // User's interests
+    const [itinerary, setItinerary] = useState(''); // Generated itinerary
 
     // Check if the user is logged in
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             setUser(currentUser);
         });
         return () => unsubscribe();
@@ -41,11 +41,13 @@ function App() {
         }
     };
 
+    // Start the chat conversation
     const startChat = () => {
         setMessages([{ sender: 'bot', text: 'Welcome to Saarthi! Where would you like to travel? Please specify your destination.' }]);
         setConversationState('askDestination');
     };
 
+    // Reset the chat
     const resetChat = () => {
         setMessages([]);
         setInput('');
@@ -56,6 +58,7 @@ function App() {
         setConversationState('idle');
     };
 
+    // Send message to the backend
     const sendMessage = async (e) => {
         e.preventDefault();
 
@@ -112,73 +115,74 @@ function App() {
 
     return (
         <div className="chat-container">
+            {/* Header */}
             <h1>🌍 Saarthi - Your Travel Companion</h1>
 
             {/* Authentication Section */}
-            {user ? (
-                <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                    <p>Welcome, {user.displayName || user.email}!</p>
-                    <button onClick={logout}>Logout</button>
-                </div>
-            ) : (
+            {!user ? (
                 <div className="start-button-container">
                     <button className="start-button" onClick={loginWithGoogle}>
                         Login with Google
                     </button>
                 </div>
-            )}
-
-            {/* Chat Interface */}
-            {user && conversationState === 'idle' && (
-                <div className="start-button-container">
-                    <button className="start-button" onClick={startChat}>
-                        Start Chat
-                    </button>
-                </div>
-            )}
-
-            {user && conversationState !== 'idle' && (
+            ) : (
                 <>
-                    <div className="chat-box">
-                        {messages.map((msg, index) => (
-                            <div key={index} className={`message ${msg.sender}`}>
-                                <p dangerouslySetInnerHTML={{ __html: msg.text }} />
-                            </div>
-                        ))}
-                        {loading && (
-                            <div className="loader">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        )}
+                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                        <p>Welcome, {user.displayName || user.email}!</p>
+                        <button onClick={logout}>Logout</button>
                     </div>
-                    <form onSubmit={sendMessage} className="input-container">
-                        {conversationState === 'postItinerary' ? (
-                            <div className="post-itinerary-buttons">
-                                <button type="button" onClick={() => setConversationState('freeChat')}>
-                                    Ask Any Question
-                                </button>
-                                <button type="button" onClick={resetChat}>
-                                    Plan Another Trip
-                                </button>
+
+                    {/* Chat Interface */}
+                    {conversationState === 'idle' ? (
+                        <div className="start-button-container">
+                            <button className="start-button" onClick={startChat}>
+                                Start Chat
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="chat-box">
+                                {messages.map((msg, index) => (
+                                    <div key={index} className={`message ${msg.sender}`}>
+                                        <p dangerouslySetInnerHTML={{ __html: msg.text }} />
+                                    </div>
+                                ))}
+                                {loading && (
+                                    <div className="loader">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                )}
                             </div>
-                        ) : (
-                            <>
-                                <input
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Type your message..."
-                                    disabled={loading}
-                                    onKeyDown={(e) => e.key === 'Enter' && sendMessage(e)}
-                                />
-                                <button type="submit" disabled={loading}>
-                                    Send
-                                </button>
-                            </>
-                        )}
-                    </form>
+                            <form onSubmit={sendMessage} className="input-container">
+                                {conversationState === 'postItinerary' ? (
+                                    <div className="post-itinerary-buttons">
+                                        <button type="button" onClick={() => setConversationState('freeChat')}>
+                                            Ask Any Question
+                                        </button>
+                                        <button type="button" onClick={resetChat}>
+                                            Plan Another Trip
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="text"
+                                            value={input}
+                                            onChange={(e) => setInput(e.target.value)}
+                                            placeholder="Type your message..."
+                                            disabled={loading}
+                                            onKeyDown={(e) => e.key === 'Enter' && sendMessage(e)}
+                                        />
+                                        <button type="submit" disabled={loading}>
+                                            Send
+                                        </button>
+                                    </>
+                                )}
+                            </form>
+                        </>
+                    )}
                 </>
             )}
         </div>

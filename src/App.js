@@ -1,13 +1,102 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
+// Styles
+const styles = {
+  message: `
+    margin: 1rem 0;
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    animation: fadeIn 0.3s ease-in-out;
+  `,
+  userMessage: `
+    margin-left: auto;
+    background-color: #1a73e8;
+    color: white;
+    border-bottom-right-radius: 0.25rem;
+  `,
+  botMessage: `
+    margin-right: auto;
+    background-color: #f1f3f4;
+    color: #202124;
+    border-bottom-left-radius: 0.25rem;
+  `,
+  typingAnimation: `
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  `,
+  dot: `
+    width: 8px;
+    height: 8px;
+    background: #90909090;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out;
+  `,
+};
+
+// Add styles to head
+const styleSheet = document.createElement("style");
+styleSheet.textContent = `
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dot:nth-child(1) { animation-delay: -0.32s; }
+  .dot:nth-child(2) { animation-delay: -0.16s; }
+
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #90909090 transparent;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: #90909090;
+    border-radius: 3px;
+  }
+`;
+document.head.appendChild(styleSheet);
+
 const TypingAnimation = () => (
-  <div className="typing-animation">
-    <div className="dot"></div>
-    <div className="dot"></div>
-    <div className="dot"></div>
+  <div style={{ ...parseStyles(styles.typingAnimation) }}>
+    <div className="dot" style={{ ...parseStyles(styles.dot) }}></div>
+    <div className="dot" style={{ ...parseStyles(styles.dot) }}></div>
+    <div className="dot" style={{ ...parseStyles(styles.dot) }}></div>
   </div>
 );
+
+// Helper function to parse CSS string to object
+function parseStyles(styleString) {
+  return styleString.split(';').reduce((acc, style) => {
+    const [property, value] = style.split(':').map(str => str.trim());
+    if (property && value) {
+      const camelCaseProperty = property.replace(/-([a-z])/g, g => g[1].toUpperCase());
+      acc[camelCaseProperty] = value;
+    }
+    return acc;
+  }, {});
+}
 
 const Message = ({ text, sender, isTyping }) => {
   const [displayText, setDisplayText] = useState('');
@@ -28,7 +117,7 @@ const Message = ({ text, sender, isTyping }) => {
           clearInterval(typeInterval);
           setIsComplete(true);
         }
-      }, 30); // Adjust typing speed here
+      }, 30);
 
       return () => clearInterval(typeInterval);
     } else {
@@ -37,13 +126,18 @@ const Message = ({ text, sender, isTyping }) => {
     }
   }, [text, sender, isTyping]);
 
+  const messageStyle = {
+    ...parseStyles(styles.message),
+    ...(sender === 'user' ? parseStyles(styles.userMessage) : parseStyles(styles.botMessage))
+  };
+
   return (
-    <div className={`message ${sender} ${isComplete ? 'complete' : ''}`}>
-      <div 
+    <div style={messageStyle}>
+      <div
         className="message-content"
-        dangerouslySetInnerHTML={{ 
-          __html: sender === 'bot' ? displayText : text 
-        }} 
+        dangerouslySetInnerHTML={{
+          __html: sender === 'bot' ? displayText : text
+        }}
       />
       {!isComplete && sender === 'bot' && <TypingAnimation />}
     </div>
@@ -100,18 +194,18 @@ function App() {
       switch (conversationState) {
         case 'askDestination':
           setDestination(input);
-          botResponse = { 
-            sender: 'bot', 
-            text: 'How many days will you be traveling?' 
+          botResponse = {
+            sender: 'bot',
+            text: 'How many days will you be traveling?'
           };
           setConversationState('askDays');
           break;
 
         case 'askDays':
           setDays(input);
-          botResponse = { 
-            sender: 'bot', 
-            text: 'What are your interests? (e.g., Culture, Food, Nature)' 
+          botResponse = {
+            sender: 'bot',
+            text: 'What are your interests? (e.g., Culture, Food, Nature)'
           };
           setConversationState('askInterests');
           break;
@@ -126,15 +220,15 @@ function App() {
               interests: input.split(',').map(i => i.trim()),
             }
           );
-          
+
           const formattedItinerary = itineraryResponse.data.reply.replace(
-            /\*\*(.*?)\*\*/g, 
+            /\*\*(.*?)\*\*/g,
             '<b>$1</b>'
           );
-          
-          botResponse = { 
-            sender: 'bot', 
-            text: formattedItinerary 
+
+          botResponse = {
+            sender: 'bot',
+            text: formattedItinerary
           };
           setItinerary(formattedItinerary);
           setConversationState('postItinerary');
@@ -149,17 +243,17 @@ function App() {
               itinerary,
             }
           );
-          
-          botResponse = { 
-            sender: 'bot', 
-            text: followUpResponse.data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') 
+
+          botResponse = {
+            sender: 'bot',
+            text: followUpResponse.data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
           };
           break;
 
         default:
-          botResponse = { 
-            sender: 'bot', 
-            text: 'I apologize, but I seem to have lost track of our conversation. Should we start over?' 
+          botResponse = {
+            sender: 'bot',
+            text: 'I apologize, but I seem to have lost track of our conversation. Should we start over?'
           };
           break;
       }
@@ -167,9 +261,9 @@ function App() {
       setMessages(prev => [...prev, botResponse]);
     } catch (error) {
       console.error('Error:', error);
-      setMessages(prev => [...prev, { 
-        sender: 'bot', 
-        text: 'I apologize, but I encountered an error. Would you like to try again?' 
+      setMessages(prev => [...prev, {
+        sender: 'bot',
+        text: 'I apologize, but I encountered an error. Would you like to try again?'
       }]);
     } finally {
       setLoading(false);
@@ -194,8 +288,8 @@ function App() {
             <h1 className="text-2xl font-bold text-center mb-4 text-gray-800">
               🌍 Saarthi - Your Travel Companion
             </h1>
-            
-            <div 
+
+            <div
               ref={chatBoxRef}
               className="flex-1 overflow-y-auto mb-4 bg-white rounded-lg shadow-md p-4"
             >

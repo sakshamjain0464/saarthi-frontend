@@ -51,7 +51,7 @@ function App() {
                 setMessages([...newMessages, { sender: 'bot', text: 'What are your interests? (e.g., Culture, Food, Nature)' }]);
             } else if (conversationState === 'askInterests') {
                 setInterests(input);
-                const response = await axios.post('https://saarthi-backend-g50f.onrender.com/generate-itinerary', {
+                const response = await axios.post('http://3.92.213.113:5000/generate-itinerary', {
                     destination,
                     days,
                     interests: input.split(',').map((i) => i.trim()),
@@ -62,7 +62,7 @@ function App() {
                 setItinerary(formattedResponse);
                 setConversationState('postItinerary');
             } else if (conversationState === 'postItinerary' || conversationState === 'freeChat') {
-                const response = await axios.post('https://saarthi-backend-g50f.onrender.com/generate-itinerary', {
+                const response = await axios.post('http://3.92.213.113:5000/generate-itinerary', {
                     followUpQuestion: input,
                     itinerary,
                 });

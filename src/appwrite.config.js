@@ -3,7 +3,7 @@ import { Client, Account, OAuthProvider } from 'appwrite'
 const client = new Client()
 client
     .setEndpoint('https://cloud.appwrite.io/v1')// The Appwrite API endpoint
-    .setProject('67a78fd50027ee57e719')// Your Appwrite project IDexport const account = new Account(client)
+    .setProject('67a6e45f000203990327')// Your Appwrite project IDexport const account = new Account(client)
 
 const account = new Account(client)
 

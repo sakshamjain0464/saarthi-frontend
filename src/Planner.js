@@ -1,63 +1,57 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import TravelForm from './TravelForm'; // Import the TravelForm component
 import './App.css';
 
 function Planner() {
     const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [conversationState, setConversationState] = useState('idle');
-    const [destination, setDestination] = useState('');
-    const [days, setDays] = useState('');
-    const [interests, setInterests] = useState('');
     const [itinerary, setItinerary] = useState('');
+    const [formData, setFormData] = useState(null); // State to store form data
 
     const startChat = () => {
-        setMessages([{ sender: 'bot', text: 'Hi I am Saarthi, Where would you like to travel? Please specify your destination.' }]);
-        setConversationState('askDestination');
+        setMessages([{ sender: 'bot', text: 'Hi! I am Saarthi. Please fill out the form to plan your trip.' }]);
+        setConversationState('form');
     };
 
     const resetChat = () => {
         setMessages([]);
-        setInput('');
-        setDestination('');
-        setDays('');
-        setInterests('');
-        setItinerary('');
+        setLoading(false);
         setConversationState('idle');
+        setItinerary('');
+        setFormData(null); // Reset form data
+    };
+
+    const handleFormSubmit = (data) => {
+        setFormData(data); // Store form data
+        setConversationState('askInterests'); // Skip asking for days
+        setMessages([
+            { sender: 'bot', text: `Planning a trip from ${data.from} to ${data.to} for ${data.numberOfPeople} people?` },
+        ]);
     };
 
     const sendMessage = async (e) => {
-        // Prevent form submission from refreshing the page
         e.preventDefault();
+        const input = e.target.value.trim();
+        if (!input) return;
 
-        if (input.trim() === '') return;
-
-        // Add user message to the chat
         const newMessages = [...messages, { sender: 'user', text: input }];
         setMessages(newMessages);
-        setInput('');
 
         try {
             setLoading(true);
 
-            if (conversationState === 'askDestination') {
-                setDestination(input);
-                setConversationState('askDays');
-                setMessages([...newMessages, { sender: 'bot', text: 'How many days will you be traveling?' }]);
-            } else if (conversationState === 'askDays') {
-                setDays(input);
-                setConversationState('askInterests');
-                setMessages([...newMessages, { sender: 'bot', text: 'What are your interests? (e.g., Culture, Food, Nature)' }]);
-            } else if (conversationState === 'askInterests') {
-                setInterests(input);
+            if (conversationState === 'askInterests') {
                 const response = await axios.post('https://saarthi-backend-g50f.onrender.com/generate-itinerary', {
-                    destination,
-                    days,
-                    interests: input.split(',').map((i) => i.trim()),
+                    destination: formData.to,
+                    days: formData.days, // Use days calculated in the form
+                    interests: formData.interests.split(',').map((i) => i.trim()),
+                    groupType: formData.groupType,
+                    additionalInfo: formData.additionalInfo,
                 });
 
-                const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, '$1');
                 setMessages([...newMessages, { sender: 'bot', text: formattedResponse }]);
                 setItinerary(formattedResponse);
                 setConversationState('postItinerary');
@@ -67,7 +61,7 @@ function Planner() {
                     itinerary,
                 });
 
-                const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, '$1');
                 setMessages([...newMessages, { sender: 'bot', text: formattedResponse }]);
             }
         } catch (error) {
@@ -78,65 +72,38 @@ function Planner() {
         }
     };
 
-    const handleKeyDown = (e) => {
-        // Remove the direct form submission on Enter key
-        // It will be handled by the form's onSubmit instead
-        if (e.key === 'Enter') {
-            e.preventDefault();
-        }
-    };
-
     return (
-        <div className="chat-container">
+        <div className="planner">
             {conversationState === 'idle' ? (
-                <div className="start-button-container">
-                    <button className="start-button" onClick={startChat}>
-                        Start Chat
-                    </button>
-                </div>
+                <button onClick={startChat}>Start Planning</button>
+            ) : conversationState === 'form' ? (
+                <TravelForm onSubmit={handleFormSubmit} />
             ) : (
                 <>
-                    <h1>🌍 Saarthi - Your Travel Companion</h1>
+                    <h2>🌍 Saarthi - Your Travel Companion</h2>
                     <div className="chat-box">
                         {messages.map((msg, index) => (
                             <div key={index} className={`message ${msg.sender}`}>
-                                <p dangerouslySetInnerHTML={{ __html: msg.text }} />
+                                <p>{msg.text}</p>
                             </div>
                         ))}
-                        {loading && (
-                            <div className="loader">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
+                        {loading && <p>Loading...</p>}
+                    </div>
+                    <div className="controls">
+                        {conversationState === 'postItinerary' ? (
+                            <>
+                                <button onClick={() => setConversationState('freeChat')}>Ask Any Question</button>
+                                <button onClick={resetChat}>Plan Another Trip</button>
+                            </>
+                        ) : (
+                            <input
+                                type="text"
+                                placeholder="Type your message..."
+                                disabled={loading}
+                                onKeyDown={(e) => e.key === 'Enter' && sendMessage(e)}
+                            />
                         )}
                     </div>
-                    <form onSubmit={sendMessage} className="input-container">
-                        {conversationState === 'postItinerary' ? (
-                            <div className="post-itinerary-buttons">
-                                <button type="button" onClick={() => setConversationState('freeChat')}>
-                                    Ask Any Question
-                                </button>
-                                <button type="button" onClick={resetChat}>
-                                    Plan Another Trip
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <input
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Type your message..."
-                                    disabled={loading}
-                                    onKeyDown={handleKeyDown}
-                                />
-                                <button type="submit" disabled={loading}>
-                                    Send
-                                </button>
-                            </>
-                        )}
-                    </form>
                 </>
             )}
         </div>

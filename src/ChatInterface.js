@@ -5,6 +5,7 @@ import { Card, CardContent } from "./components/ui/card"
 import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import { Send, Loader2 } from "lucide-react"
+import MarkDownRenderer from "./components/ui/markdownRenderer"
 
 export default function ChatInterface({
   messages,
@@ -38,11 +39,14 @@ export default function ChatInterface({
         {messages.map((message) => (
           <div key={message.id} className={`mb-4 ${message.sender === "bot" ? "text-left" : "text-right"}`}>
             <div
-              className={`inline-block p-3 rounded-lg ${
-                message.sender === "bot" ? "bg-blue-100 text-blue-900" : "bg-green-100 text-green-900"
-              }`}
+              className={`inline-block p-3 rounded-lg ${message.sender === "bot" ? "bg-blue-100 text-blue-900" : "bg-green-100 text-green-900"
+                }`}
             >
-              {message.content}
+              {message.sender === "bot" ? (
+                <MarkDownRenderer message={message.content} />
+              ) : (
+                message.content
+              )}
             </div>
           </div>
         ))}
@@ -71,6 +75,7 @@ export default function ChatInterface({
             </Button>
           </div>
         )}
+
       </div>
     </Card>
   )

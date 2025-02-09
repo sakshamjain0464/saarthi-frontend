@@ -8,6 +8,7 @@ import { Label } from "./components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select"
 import { Textarea } from "./components/ui/textarea"
 import { MapPin, CalendarIcon, Users, Heart } from "lucide-react"
+import { toast } from "react-toastify"
 
 export default function TravelForm({ onSubmit }) {
   const [formData, setFormData] = useState({
@@ -16,7 +17,7 @@ export default function TravelForm({ onSubmit }) {
     startDate: "",
     endDate: "",
     numberOfPeople: "1",
-    groupType: "",
+    groupType: "Family",
     interests: "",
     additionalInfo: "",
   })
@@ -40,6 +41,23 @@ export default function TravelForm({ onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     // Add form validation here
+    // onSubmit(formData)
+    if (!formData.from || !formData.to || !formData.startDate || !formData.endDate || !formData.numberOfPeople || !formData.groupType || !formData.interests) {
+      toast.error("Please fill out all required fields.")
+      return
+    }
+    if (new Date(formData.startDate) > new Date(formData.endDate)) {
+      toast.error("End date must be greater than start date.")
+      return
+    }
+    if (formData.numberOfPeople < 1) {
+      toast.error("Number of travelers must be greater than 0.")
+      return
+    }
+    if (new Date(formData.startDate) < new Date() || new Date(formData.endDate) < new Date()) {
+      toast.error("Start and end date must be in the future.")
+      return
+    }
     onSubmit(formData)
   }
 
@@ -118,18 +136,14 @@ export default function TravelForm({ onSubmit }) {
                 <Label>Group Type</Label>
                 <Select
                   value={formData.groupType}
-                  onValueChange={(value) => handleChange({ target: { name: "groupType", value } })}
+                  onChange={(event) => handleChange(event)}
+                  name="groupType"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select group type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Family">Family</SelectItem>
-                    <SelectItem value="Friends">Friends</SelectItem>
-                    <SelectItem value="Couple">Couple</SelectItem>
-                    <SelectItem value="Solo">Solo</SelectItem>
-                    <SelectItem value="Business">Business</SelectItem>
-                  </SelectContent>
+                  <SelectItem value="Family">Family</SelectItem>
+                  <SelectItem value="Friends">Friends</SelectItem>
+                  <SelectItem value="Couple">Couple</SelectItem>
+                  <SelectItem value="Solo">Solo</SelectItem>
+                  <SelectItem value="Business">Business</SelectItem>
                 </Select>
               </div>
             </div>

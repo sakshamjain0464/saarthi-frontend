@@ -35,6 +35,8 @@ export default function Planner() {
 
   const handleFormSubmit = (data) => {
     setFormData(data)
+    console.log(formData)
+    console.log(data)
     setConversationState("askInterests")
     setMessages([
       {
@@ -49,15 +51,11 @@ export default function Planner() {
   const generateItinerary = async (data) => {
     try {
       setLoading(true)
-      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", {
-        destination: data.to,
-        days: data.days,
-        interests: data.interests.split(",").map((i) => i.trim()),
-        groupType: data.groupType,
-        additionalInfo: data.additionalInfo,
-      })
+      // https://saarthi-backend-g50f.onrender.com/generate-itinerary
+      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", data)
 
-      const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, "$1")
+      const formattedResponse = response.data.data
+      console.log(formattedResponse)
       setMessages((prev) => [
         ...prev,
         {
@@ -96,12 +94,13 @@ export default function Planner() {
 
     try {
       setLoading(true)
+      // https://saarthi-backend-g50f.onrender.com/generate-itinerary
       const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", {
         followUpQuestion: message,
         itinerary,
       })
 
-      const formattedResponse = response.data.reply.replace(/\*\*(.*?)\*\*/g, "$1")
+      const formattedResponse = response.data.data
       setMessages((prev) => [
         ...prev,
         {

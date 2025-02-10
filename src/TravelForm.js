@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "./components/ui/card"
 import { Input } from "./components/ui/input"
 import { Button } from "./components/ui/button"
@@ -10,7 +10,8 @@ import { Textarea } from "./components/ui/textarea"
 import { MapPin, CalendarIcon, Users, Heart } from "lucide-react"
 import { toast } from "react-toastify"
 
-export default function TravelForm({ onSubmit }) {
+
+export default function TravelForm({ onSubmit, setLanguage }) {
   const [formData, setFormData] = useState({
     from: "",
     to: "",
@@ -20,6 +21,9 @@ export default function TravelForm({ onSubmit }) {
     groupType: "Family",
     interests: "",
     additionalInfo: "",
+
+    language: "English",
+
   })
 
   const [errors, setErrors] = useState({})
@@ -37,6 +41,12 @@ export default function TravelForm({ onSubmit }) {
       }))
     }
   }
+
+
+  useEffect(() => {
+    setLanguage(formData.language)
+  })
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -160,6 +170,20 @@ export default function TravelForm({ onSubmit }) {
                 value={formData.interests}
                 onChange={handleChange}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="interests" className="flex items-center gap-2">
+                Preferred Language
+              </Label>
+              <Select
+                value={formData.language}
+                onChange={(event) => handleChange(event)}
+                name="language"
+              >
+                <SelectItem value="English">English</SelectItem>
+                <SelectItem value="Hindi">Hindi</SelectItem>
+              </Select>
             </div>
 
             <div className="space-y-2">

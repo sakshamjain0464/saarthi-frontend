@@ -13,6 +13,7 @@ export default function Planner() {
   const [conversationState, setConversationState] = useState("idle")
   const [itinerary, setItinerary] = useState("")
   const [formData, setFormData] = useState(null)
+  const [language, setLanguage] = useState("English")
 
   const startChat = () => {
     setMessages([
@@ -95,9 +96,10 @@ export default function Planner() {
     try {
       setLoading(true)
       // https://saarthi-backend-g50f.onrender.com/generate-itinerary
-      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", {
-        followUpQuestion: message,
+      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/ask-question", {
+        question: message,
         itinerary,
+        language,
       })
 
       const formattedResponse = response.data.data
@@ -140,7 +142,9 @@ export default function Planner() {
   }
 
   if (conversationState === "form") {
-    return <TravelForm onSubmit={handleFormSubmit} />
+
+    return <TravelForm onSubmit={handleFormSubmit} setLanguage={setLanguage} />
+
   }
 
   return (
@@ -151,6 +155,9 @@ export default function Planner() {
       isPostItinerary={conversationState === "postItinerary"}
       onStartNewChat={() => setConversationState("freeChat")}
       onResetChat={resetChat}
+
+      language={language}
+
     />
   )
 }

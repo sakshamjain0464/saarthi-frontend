@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { loginWithGoogle, getUser } from './appwrite.config';
+import { loginWithGoogle, getUser, logoutUser } from './appwrite.config';
 import Planner from './Planner';
 import { Button } from '../src/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
-import MarkDownRenderer from './components/ui/markdownRenderer';
 
 
 export default function App() {
@@ -25,12 +24,18 @@ export default function App() {
         checkUser();
     }, []);
 
+    async function handleLogoutUser() {
+        await logoutUser();
+        setUser(null)
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-purple-600 via-blue-500 to-teal-400">
-            <MarkDownRenderer message={""} />
             {user ? (
                 <div className="p-4">
-                    <p className="text-white text-lg mb-4">Welcome, {user.name}!</p>
+                    <button onClick={handleLogoutUser} className='bg-white py-2 px-6 rounded-xl flex gap-2 fixed right-0'><LogOut />
+                        Logout</button>
+                    <p className="text-white text-lg mb-4 text-center">Welcome, {user.name}!</p>
                     <Planner />
                 </div>
             ) : (

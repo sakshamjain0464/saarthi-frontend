@@ -53,8 +53,32 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+  /* Width of vertical scrollbar */
+  height: 8px;
+  /* Height of horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  /* Track color */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Scrollbar color */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Darker on hover */
+}

@@ -9,7 +9,7 @@ const account = new Account(client)
 
 export const loginWithGoogle = async () => {
     try {
-        await account.createOAuth2Session(OAuthProvider.Google, 'https://saaraitiktiwari.in/')
+        await account.createOAuth2Session(OAuthProvider.Google, 'https://saarthi.naitiktiwari.in/')
         //await account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:3000')
     } catch (error) {
         console.error(error)

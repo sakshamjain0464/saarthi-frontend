@@ -14,6 +14,7 @@ export default function Planner() {
   const [itinerary, setItinerary] = useState("")
   const [formData, setFormData] = useState(null)
   const [language, setLanguage] = useState("English")
+  const [iterinary, setIterinary] = useState("")
 
   const startChat = () => {
     setMessages([
@@ -53,9 +54,10 @@ export default function Planner() {
     try {
       setLoading(true)
       // https://saarthi-backend-g50f.onrender.com/generate-itinerary
-      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", data)
+      const response = await axios.post("http://localhost:5000/generate-itinerary", data)
 
       const formattedResponse = response.data.data
+      setIterinary(formattedResponse)
       console.log(formattedResponse)
       setMessages((prev) => [
         ...prev,
@@ -96,7 +98,7 @@ export default function Planner() {
     try {
       setLoading(true)
       // https://saarthi-backend-g50f.onrender.com/generate-itinerary
-      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/ask-question", {
+      const response = await axios.post("http://localhost:5000/ask-question", {
         question: message,
         itinerary,
         language,
@@ -123,6 +125,30 @@ export default function Planner() {
       ])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const generateItineraryPDF = async (itineraryMarkdown) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/download-itinerary',
+        { itineraryMarkdown: iterinary },
+        { responseType: 'blob' } // Important for handling binary data
+      );
+
+      // Create a URL for the PDF blob and trigger a download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'itinerary.pdf');
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the DOM and revoke the URL
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating itinerary PDF:', error);
     }
   }
 
@@ -155,7 +181,7 @@ export default function Planner() {
       isPostItinerary={conversationState === "postItinerary"}
       onStartNewChat={() => setConversationState("freeChat")}
       onResetChat={resetChat}
-
+      downloadIterinary={generateItineraryPDF}
       language={language}
 
     />

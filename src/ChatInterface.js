@@ -6,8 +6,7 @@ import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import { Send, Loader2 } from "lucide-react"
 import MarkDownRenderer from "./components/ui/markdownRenderer"
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import axios from "axios"
 
 import { Volume2 } from "lucide-react"
 import removeMarkdown from "remove-markdown"
@@ -21,6 +20,7 @@ export default function ChatInterface({
   onStartNewChat,
   onResetChat,
   language,
+  downloadIterinary
 }) {
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
@@ -33,30 +33,6 @@ export default function ChatInterface({
   useEffect(scrollToBottom, [])
 
   const markdownRef = useRef();
-  const exportToPDF = async () => {
-    const tempDiv = document.createElement("div");
-    tempDiv.style.position = "absolute";
-    tempDiv.style.left = "-9999px";
-    tempDiv.style.width = "800px";
-    tempDiv.style.padding = "20px";
-    tempDiv.style.fontFamily = "Arial, sans-serif";
-    tempDiv.style.background = "#fff";
-
-    document.body.appendChild(tempDiv);
-    tempDiv.innerHTML = markdownRef.current.innerHTML;
-
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Ensure content is fully loaded
-
-    html2canvas(tempDiv, { scale: 2 }).then((canvas) => {
-      document.body.removeChild(tempDiv);
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 190;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-      pdf.save("itirenary.pdf");
-    });
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -84,6 +60,8 @@ export default function ChatInterface({
         utterance.lang = "en-US" // English (United States)
       }
 
+      utterance.rate = 1.2 // 1.0 is the default rate
+
       // Optionally set a specific voice if desired:
       const voices = window.speechSynthesis.getVoices()
       const voice = voices.find((v) => v.lang === utterance.lang)
@@ -100,6 +78,11 @@ export default function ChatInterface({
       console.error("Speech synthesis not supported in this browser.")
     }
   }
+
+  // useEffect(() => {
+  //   return window.speechSynthesis.cancel()
+  // })
+
   return (
     <Card className="max-w-2xl mx-auto h-[80vh] flex flex-col">
       <CardContent className="flex-grow overflow-auto p-4">
@@ -146,7 +129,7 @@ export default function ChatInterface({
             <Button onClick={onResetChat} variant="outline" className="flex-grow">
               Reset Chat
             </Button>
-            <Button onClick={exportToPDF} variant="outline" className="flex-grow">
+            <Button onClick={downloadIterinary} variant="outline" className="flex-grow">
               Download itinerary
             </Button>
             {isSpeaking && <Button onClick={() => {

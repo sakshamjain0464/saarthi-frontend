@@ -54,7 +54,7 @@ export default function Planner() {
     try {
       setLoading(true)
       // https://saarthi-backend-g50f.onrender.com/generate-itinerary
-      const response = await axios.post("http://localhost:5000/generate-itinerary", data)
+      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", data)
 
       const formattedResponse = response.data.data
       setIterinary(formattedResponse)
@@ -98,7 +98,7 @@ export default function Planner() {
     try {
       setLoading(true)
       // https://saarthi-backend-g50f.onrender.com/generate-itinerary
-      const response = await axios.post("http://localhost:5000/ask-question", {
+      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", {
         question: message,
         itinerary,
         language,

@@ -110,7 +110,7 @@ export default function Planner({ user }) {
       setLoading(true)
 
       // https://saarthi-backend-g50f.onrender.com/generate-itinerary
-      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", {
+      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/ask-question", {
 
         question: message,
         iterinary,

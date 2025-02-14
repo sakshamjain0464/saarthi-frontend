@@ -131,7 +131,7 @@ export default function Planner() {
   const generateItineraryPDF = async (itineraryMarkdown) => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/download-itinerary',
+        'https://saarthi-backend-g50f.onrender.com/download-itinerary',
         { itineraryMarkdown: iterinary },
         { responseType: 'blob' } // Important for handling binary data
       );

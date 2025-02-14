@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loginWithGoogle, getUser, logoutUser } from './appwrite.config';
+import { loginWithGoogle, getUser, logoutUser } from './authHelper';
 import Planner from './Planner';
 import { Button } from '../src/components/ui/button';
 import { Loader2, LogOut } from 'lucide-react';
@@ -36,7 +36,7 @@ export default function App() {
                     <button onClick={handleLogoutUser} className='bg-white py-2 px-6 rounded-xl flex gap-2 fixed right-0'><LogOut />
                         Logout</button>
                     <p className="text-white text-lg mb-4 text-center">Welcome, {user.name}!</p>
-                    <Planner />
+                    <Planner user={user} />
                 </div>
             ) : (
                 <div className="flex items-center justify-center min-h-screen">

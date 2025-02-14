@@ -46,8 +46,11 @@ export default function Planner({ user }) {
   const generateItinerary = async (data) => {
     try {
       setLoading(true)
-      // Call your backend to generate the itinerary
+
+      // https://saarthi-backend-g50f.onrender.com/generate-itinerary
       const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", data)
+
+
       const formattedResponse = response.data.data
       setIterinary(formattedResponse)
       // Save the trip data in Appwrite
@@ -105,7 +108,10 @@ export default function Planner({ user }) {
 
     try {
       setLoading(true)
-      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/ask-question", {
+
+      // https://saarthi-backend-g50f.onrender.com/generate-itinerary
+      const response = await axios.post("https://saarthi-backend-g50f.onrender.com/generate-itinerary", {
+
         question: message,
         iterinary,
         language,
@@ -134,7 +140,9 @@ export default function Planner({ user }) {
   const generateItineraryPDF = async () => {
     try {
       const response = await axios.post(
-        "https://saarthi-backend-g50f.onrender.com/download-itinerary",
+
+        'https://saarthi-backend-g50f.onrender.com/download-itinerary',
+
         { itineraryMarkdown: iterinary },
         { responseType: "blob" }
       )

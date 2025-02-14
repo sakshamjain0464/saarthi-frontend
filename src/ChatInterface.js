@@ -4,13 +4,9 @@ import { useRef, useEffect, useState } from "react"
 import { Card, CardContent } from "./components/ui/card"
 import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
-import { Send, Loader2 } from "lucide-react"
+import { Send, Loader2, Volume2 } from "lucide-react"
 import MarkDownRenderer from "./components/ui/markdownRenderer"
-import axios from "axios"
-
-import { Volume2 } from "lucide-react"
 import removeMarkdown from "remove-markdown"
-
 
 export default function ChatInterface({
   messages,
@@ -20,19 +16,18 @@ export default function ChatInterface({
   onStartNewChat,
   onResetChat,
   language,
-  downloadIterinary
+  downloadIterinary,
+  iterinary = "", // default to empty string if undefined
+  initialMessage
 }) {
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const [isSpeaking, setIsSpeaking] = useState(false)
 
-  const scrollToBottom = () => {
+  // Scroll to bottom on messages change
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  useEffect(scrollToBottom, [])
-
-  const markdownRef = useRef();
+  }, [messages])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -53,16 +48,12 @@ export default function ChatInterface({
       setIsSpeaking(true)
       const plainText = removeMarkdown(text)
       const utterance = new SpeechSynthesisUtterance(plainText)
-      // Optionally, you can set the language, pitch, and rate
-      if (language === "Hindi") {
-        utterance.lang = "hi-IN" // Hindi (India)
-      } else {
-        utterance.lang = "en-US" // English (United States)
-      }
 
-      utterance.rate = 1.2 // 1.0 is the default rate
+      // Set language based on the provided language prop
+      utterance.lang = language === "Hindi" ? "hi-IN" : "en-US"
+      utterance.rate = 1.2
 
-      // Optionally set a specific voice if desired:
+      // Optionally set a specific voice if desired
       const voices = window.speechSynthesis.getVoices()
       const voice = voices.find((v) => v.lang === utterance.lang)
       if (voice) {
@@ -79,21 +70,39 @@ export default function ChatInterface({
     }
   }
 
-  // useEffect(() => {
-  //   return window.speechSynthesis.cancel()
-  // })
-
   return (
     <Card className="max-w-2xl mx-auto h-[80vh] flex flex-col">
       <CardContent className="flex-grow overflow-auto p-4">
+        {/* Render the initial message */}
+        {initialMessage && (
+          <div className="mb-4 text-left">
+            <div className="inline-block p-3 rounded-lg bg-blue-100 text-blue-900">
+              <MarkDownRenderer message={initialMessage} />
+              <Button onClick={() => speakMessage(initialMessage)} variant="outline" className="mt-2">
+                <Volume2 className="w-4 h-4 mr-2" />
+                Speak
+              </Button>
+            </div>
+          </div>
+        )}
+        {/* Render the itinerary if available */}
+        {iterinary && iterinary.length > 0 && (
+          <div className="mb-4 text-left">
+            <div className="inline-block p-3 rounded-lg bg-blue-100 text-blue-900">
+              <MarkDownRenderer message={iterinary} />
+              <Button onClick={() => speakMessage(iterinary)} variant="outline" className="mt-2">
+                <Volume2 className="w-4 h-4 mr-2" />
+                Speak
+              </Button>
+            </div>
+          </div>
+        )}
+        {/* Render each message */}
         {messages.map((message) => (
           <div key={message.id} className={`mb-4 ${message.sender === "bot" ? "text-left" : "text-right"}`}>
-            <div
-              className={`inline-block p-3 rounded-lg ${message.sender === "bot" ? "bg-blue-100 text-blue-900" : "bg-green-100 text-green-900"
-                }`}
-            >
+            <div className={`inline-block p-3 rounded-lg ${message.sender === "bot" ? "bg-blue-100 text-blue-900" : "bg-green-100 text-green-900"}`}>
               {message.sender === "bot" ? (
-                <div ref={markdownRef}>
+                <div>
                   <MarkDownRenderer message={message.content} />
                   <Button onClick={() => speakMessage(message.content)} variant="outline" className="mt-2">
                     <Volume2 className="w-4 h-4 mr-2" />
@@ -132,18 +141,21 @@ export default function ChatInterface({
             <Button onClick={downloadIterinary} variant="outline" className="flex-grow">
               Download itinerary
             </Button>
-            {isSpeaking && <Button onClick={() => {
-              setIsSpeaking(false)
-              window.speechSynthesis.cancel()
-            }} variant="outline" className="flex-grow">
-              Stop Speaking
-            </Button>}
+            {isSpeaking && (
+              <Button
+                onClick={() => {
+                  setIsSpeaking(false)
+                  window.speechSynthesis.cancel()
+                }}
+                variant="outline"
+                className="flex-grow"
+              >
+                Stop Speaking
+              </Button>
+            )}
           </div>
         )}
-
       </div>
-
     </Card>
   )
 }
-

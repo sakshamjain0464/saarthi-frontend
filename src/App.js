@@ -29,6 +29,10 @@ export default function App() {
         setUser(null)
     }
 
+    function handleGuestLogin() {
+        setUser({ name: "Guest", $id: "guest" })
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-purple-600 via-blue-500 to-teal-400">
             {user ? (
@@ -40,12 +44,22 @@ export default function App() {
                 </div>
             ) : (
                 <div className="flex items-center justify-center min-h-screen">
-                    {loading ? (<Loader2 className="w-6 h-6 animate-spin inline-block" />) : (<Button
-                        onClick={loginWithGoogle}
-                        className="bg-white text-purple-600 hover:bg-gray-100"
-                    >
-                        Login with Google
-                    </Button>)}
+                    {loading ? (<Loader2 className="w-6 h-6 animate-spin inline-block" />) : (
+                        <div className='flex flex-col gap-4'>
+                            <Button
+                                onClick={loginWithGoogle}
+                                className="bg-white text-purple-600 hover:bg-gray-100"
+                            >
+                                Login with Google
+                            </Button>
+                            <Button
+                                onClick={handleGuestLogin}
+                                className="bg-white text-purple-600 hover:bg-gray-100"
+                            >
+                                Use As Guest
+                            </Button>
+                        </div>
+                    )}
                 </div>
             )}
             <ToastContainer />

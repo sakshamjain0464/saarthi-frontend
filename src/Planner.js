@@ -141,9 +141,9 @@ export default function Planner({ user }) {
     try {
       const response = await axios.post(
 
-        'https://saarthi-backend-g50f.onrender.com/download-itinerary',
+        'http://localhost:5001/download-itinerary',
 
-        { itineraryMarkdown: iterinary },
+        { itineraryMarkdown: iterinary, language },
         { responseType: "blob" }
       )
 

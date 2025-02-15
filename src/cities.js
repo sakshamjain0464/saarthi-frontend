@@ -1477,6 +1477,129 @@ const westBengalCities = [
     "Cooch Behar"
 ];
 
+const andamanAndNicobarPlaces = [
+    "Port Blair",
+    "Havelock Island",
+    "Neil Island",
+    "Baratang Island",
+    "Ross Island",
+    "North Bay Island",
+    "Long Island",
+    "Little Andaman",
+    "Barren Island",
+    "Diglipur",
+    "Mayabunder",
+    "Rangat",
+    "Car Nicobar",
+    "Katchal Island",
+    "Great Nicobar"
+];
+
+const chandigarhAreas = [
+    "Sector 1",
+    "Sector 17",
+    "Sector 22",
+    "Sector 35",
+    "Sector 43",
+    "Manimajra",
+    "Industrial Area Phase 1",
+    "Industrial Area Phase 2",
+    "Daria",
+    "Burail",
+    "Hallomajra",
+    "Maloya",
+    "Daddu Majra",
+    "Kishangarh"
+];
+
+const dadraNagarHaveliDamanDiu = [
+    // Dadra and Nagar Haveli
+    "Silvassa",
+    "Amli",
+    "Dadra",
+    "Naroli",
+    "Samarvarni",
+    "Rakholi",
+
+    // Daman
+    "Daman",
+    "Moti Daman",
+    "Nani Daman",
+    "Varkund",
+    "Kadaiya",
+
+    // Diu
+    "Diu",
+    "Vanakbara",
+    "Ghoghla",
+    "Bucharwada",
+    "Fudam"
+]
+
+const lakshadweepIslands = [
+    "Kavaratti",
+    "Agatti",
+    "Bangaram",
+    "Minicoy",
+    "Amini",
+    "Kadmat",
+    "Kalpeni",
+    "Chetlat",
+    "Bitra",
+    "Andrott"
+];
+
+const delhiDistricts = [
+    "Central Delhi",
+    "East Delhi",
+    "New Delhi",
+    "North Delhi",
+    "North East Delhi",
+    "North West Delhi",
+    "Shahdara",
+    "South Delhi",
+    "South East Delhi",
+    "South West Delhi",
+    "West Delhi"
+]
+const puducherryDistricts = [
+    "Puducherry",
+    "Karaikal",
+    "Mahe",
+    "Yanam"
+];
+const jammuKashmirDistricts = [
+    // Jammu Division
+    "Jammu",
+    "Samba",
+    "Kathua",
+    "Udhampur",
+    "Reasi",
+    "Ramban",
+    "Doda",
+    "Kishtwar",
+    "Poonch",
+    "Rajouri",
+
+    // Kashmir Division
+    "Srinagar",
+    "Ganderbal",
+    "Budgam",
+    "Pulwama",
+    "Anantnag",
+    "Kulgam",
+    "Shopian",
+    "Baramulla",
+    "Kupwara",
+    "Bandipora"
+];
+
+const ladakhDistricts = [
+    "Leh",
+    "Kargil"
+];
+
+
 
 const states = [
     {
@@ -1591,7 +1714,40 @@ const states = [
     {
         name: "West Bengal",
         cities: westBengalCities
+    },
+    {
+        name: "Andaman and Nicobar Islands",
+        cities: andamanAndNicobarPlaces
+    },
+    {
+        name: "Chandigarh",
+        cities: chandigarhAreas
+    },
+    {
+        name: "Dadra and Nagar Haveli and Daman and Diu",
+        cities: dadraNagarHaveliDamanDiu
+    },
+    {
+        name: "Lakshadweep",
+        cities: lakshadweepIslands
+    },
+    {
+        name: "Delhi",
+        cities: delhiDistricts
+    },
+    {
+        name: "Puducherry",
+        cities: puducherryDistricts,
+    },
+    {
+        name: "Jammu and Kashmir",
+        cities: jammuKashmirDistricts
+    },
+    {
+        name: "Ladakh",
+        cities: ladakhDistricts
     }
+
 ]
 
 

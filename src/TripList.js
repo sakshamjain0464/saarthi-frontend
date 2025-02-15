@@ -7,6 +7,8 @@ import { toast } from "react-toastify"
 import { MapPin, Calendar, Plane, Trash, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
+
+
 export default function TripList({ user, onSelectTrip }) {
     const [trips, setTrips] = useState([])
     const [loading, setLoading] = useState(true)

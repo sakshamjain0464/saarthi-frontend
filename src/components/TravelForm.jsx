@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "./components/ui/card";
-import { Input } from "./components/ui/input";
-import { Button } from "./components/ui/button";
-import { Label } from "./components/ui/label";
-import { Select, SelectItem } from "./components/ui/select";
-import { Textarea } from "./components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Select, SelectItem } from "./ui/select";
+import { Textarea } from "./ui/textarea";
 import { MapPin, CalendarIcon, Users, Heart } from "lucide-react";
 import { toast } from "react-toastify";
 
 // Import your states array
-import states from "./cities"; // adjust the import path as needed
+import states from "../cities"; // adjust the import path as needed
 
 export default function TravelForm({ onSubmit, setLanguage }) {
   // Initialize form state with departure, destination, and viaCities.

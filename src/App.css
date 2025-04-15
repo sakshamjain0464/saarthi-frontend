@@ -351,3 +351,40 @@ button:disabled {
   margin-top: -10px;
   margin-bottom: 10px;
 }
+
+/* Desktop layout */
+@media (min-width: 768px) {
+  .chat-map-container {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 2rem;
+    height: 80vh;
+  }
+}
+
+/* Mobile layout */
+@media (max-width: 767px) {
+  .map-container {
+    display: none;
+  }
+  
+  .mobile-map-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  
+  .map-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1001;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

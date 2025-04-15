@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import TravelForm from './TravelForm'
 import ChatInterface from './ChatInterface'
+import ChatMapLayout from './ChatMapLayout' // Import the ChatMapLayout component
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import { toast } from 'react-toastify'
@@ -15,10 +16,12 @@ import {
 } from '../helpers/dbHelpers'
 import { backendUrl } from '../env.exports'
 import TripList from './TripList' // Import the TripList component
+import useMediaQuery from '../lib/hooks/useMediaQuery'
 
 axios.defaults.baseURL = backendUrl
 
 export default function Planner ({ user }) {
+  const isMobile = useMediaQuery('(max-width: 767px)')
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
   const [conversationState, setConversationState] = useState('idle')
@@ -254,27 +257,43 @@ export default function Planner ({ user }) {
         <Button onClick={resetChat} className='absolute'>
           ← Back to Trips
         </Button>
-        <ChatInterface
-          messages={messages}
-          loading={loading}
-          onSendMessage={sendMessage}
-          isPostItinerary={conversationState === 'postItinerary'}
-          onStartNewChat={() => setConversationState('freeChat')}
-          onResetChat={resetChat}
-          downloadIterinary={generateItineraryPDF}
-          language={language}
-          iterinary={iterinary}
-          isModifyIterinary={isModifyIterinary}
-          setIsModifyIterinary={setIsModifyIterinary}
-          setIterinary={setIterinary}
-          modifyIterinary={modifyIterinary}
-          iterinaryId={iterinaryId}
-          initialMessage={
-            formData
-              ? `Great! I'm planning a trip from ${formData.departureCity} to ${formData.destinationCity} for ${formData.numberOfPeople} people. Let me create an itinerary based on your interests.`
-              : ''
-          }
-        />
+        
+        {/* Wrap ChatInterface with ChatMapLayout for responsive design */}
+        <ChatMapLayout 
+          locations={[
+            // Extract locations from the destination city
+            // This is a simple example - in a real app, you would parse the itinerary
+            // to extract actual coordinates or use a geocoding service
+            formData ? { 
+              name: formData.destinationCity, 
+              lat: 20.5937, // Default coordinates - would be replaced with actual coordinates
+              lng: 78.9629  // Default coordinates - would be replaced with actual coordinates
+            } : {}
+          ]}
+          onCloseMap={() => {}}
+        >
+          <ChatInterface
+            messages={messages}
+            loading={loading}
+            onSendMessage={sendMessage}
+            isPostItinerary={conversationState === 'postItinerary'}
+            onStartNewChat={() => setConversationState('freeChat')}
+            onResetChat={resetChat}
+            downloadIterinary={generateItineraryPDF}
+            language={language}
+            iterinary={iterinary}
+            isModifyIterinary={isModifyIterinary}
+            setIsModifyIterinary={setIsModifyIterinary}
+            setIterinary={setIterinary}
+            modifyIterinary={modifyIterinary}
+            iterinaryId={iterinaryId}
+            initialMessage={
+              formData
+                ? `Great! I'm planning a trip from ${formData.departureCity} to ${formData.destinationCity} for ${formData.numberOfPeople} people. Let me create an itinerary based on your interests.`
+                : ''
+            }
+          />
+        </ChatMapLayout>
       </div>
     </>
   )
